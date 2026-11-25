@@ -1,0 +1,23 @@
+# Eclipse / e² studio metadata & logs
+.metadata/
+*.log
+JLinkLog.log
+
+# Build intermediate objects and dependencies
+**/Debug/**/*.o
+**/Debug/**/*.d
+**/Debug/src/**/*.o
+**/Debug/src/**/*.d
+**/Debug/ra/**/*.o
+**/Debug/ra/**/*.d
+**/Debug/ra_gen/**/*.o
+**/Debug/ra_gen/**/*.d
+
+# Redundant local backups
+SDcard_Test_Backup/
+**/Sd_card_test/
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
