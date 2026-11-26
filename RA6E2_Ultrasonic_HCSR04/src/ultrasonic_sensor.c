@@ -19,6 +19,15 @@ static ultrasonic_config_t s_config = {
 
 static bool s_is_initialized = false;
 
+/* Fast direct register control for TRIG (P105 / Port 1 Pin 5) */
+#define TRIG_PIN_HIGH() (R_PORT1->PCNTR3 = (1UL << 5))
+#define TRIG_PIN_LOW()  (R_PORT1->PCNTR3 = (1UL << (5 + 16)))
+
+static inline uint32_t echo_pin_read(void)
+{
+    return R_BSP_PinRead(BSP_IO_PORT_04_PIN_08);
+}
+
 fsp_err_t ultrasonic_init(const ultrasonic_config_t *p_cfg)
 {
     if (p_cfg != NULL)
@@ -29,17 +38,14 @@ fsp_err_t ultrasonic_init(const ultrasonic_config_t *p_cfg)
     /* Unlock Pin Configuration */
     R_BSP_PinAccessEnable();
 
-    /* Configure TRIG as GPIO Output, initial LOW */
-    R_BSP_PinCfg(s_config.trig_pin, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_LOW));
+    /* Configure TRIG (P105 / Arduino D2) as GPIO Output, initial LOW */
+    R_BSP_PinCfg(BSP_IO_PORT_01_PIN_05, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_LOW));
 
-    /* Configure ECHO as GPIO Input */
-    R_BSP_PinCfg(s_config.echo_pin, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_INPUT));
-
-    /* Lock Pin Configuration */
-    R_BSP_PinAccessDisable();
+    /* Configure ECHO (P408 / Arduino D3) as GPIO Input */
+    R_BSP_PinCfg(BSP_IO_PORT_04_PIN_08, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_INPUT));
 
     /* Ensure TRIG is cleanly LOW */
-    R_BSP_PinWrite(s_config.trig_pin, BSP_IO_LEVEL_LOW);
+    TRIG_PIN_LOW();
 
     s_is_initialized = true;
     return FSP_SUCCESS;
@@ -96,17 +102,17 @@ ultrasonic_status_t ultrasonic_measure(ultrasonic_result_t *p_result)
     }
 
     /* 1. Ensure TRIG is LOW before pulsing */
-    R_BSP_PinWrite(s_config.trig_pin, BSP_IO_LEVEL_LOW);
+    TRIG_PIN_LOW();
     timer_delay_us(4U);
 
     /* 2. Generate 10 microsecond trigger pulse */
-    R_BSP_PinWrite(s_config.trig_pin, BSP_IO_LEVEL_HIGH);
+    TRIG_PIN_HIGH();
     timer_delay_us(10U);
-    R_BSP_PinWrite(s_config.trig_pin, BSP_IO_LEVEL_LOW);
+    TRIG_PIN_LOW();
 
     /* 3. Wait for ECHO rising edge with hard timeout */
     uint32_t wait_start = timer_get_cycles();
-    while (R_BSP_PinRead(s_config.echo_pin) == 0U)
+    while (echo_pin_read() == 0U)
     {
         if (timer_elapsed_us(wait_start) > s_config.rising_timeout_us)
         {
@@ -121,7 +127,7 @@ ultrasonic_status_t ultrasonic_measure(ultrasonic_result_t *p_result)
     uint32_t echo_start = timer_get_cycles();
 
     /* 5. Wait for ECHO falling edge with hard timeout */
-    while (R_BSP_PinRead(s_config.echo_pin) != 0U)
+    while (echo_pin_read() != 0U)
     {
         if (timer_elapsed_us(echo_start) > s_config.falling_timeout_us)
         {
