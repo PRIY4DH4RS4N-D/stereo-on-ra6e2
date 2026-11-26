@@ -86,27 +86,47 @@ void uart_logger_init(uint32_t baud_rate)
         s_bit_cycles = 1736U;
     }
 
-    /* Configure P411 as GPIO Output High (UART idle state) */
+    /* 1. Configure hardware SCI0 for onboard J-Link CDC UART (COM5) */
+    R_BSP_MODULE_START(FSP_IP_SCI, 0);
+    R_SCI0->SCR = 0;
+    R_SCI0->FCR = 0xF800U; /* Disable FIFO for direct TDR access */
+    R_SCI0->SMR = 0;       /* Asynchronous, 8N1, no clock prescaler */
+    R_SCI0->SCMR = 0xF2U;  /* Eight bits, LSB first, normal polarity */
+    R_SCI0->SEMR = R_SCI0_SEMR_BGDM_Msk;
+    uint32_t clock = R_FSP_SystemClockHzGet(BSP_FEATURE_SCI_CLOCK);
+    uint32_t divisor = 16U * (baud_rate > 0U ? baud_rate : 115200U);
+    R_SCI0->BRR = (uint8_t) ((clock + divisor / 2U) / divisor - 1U);
+    R_BSP_SoftwareDelay(10U, BSP_DELAY_UNITS_MICROSECONDS);
+    R_SCI0->SCR = R_SCI0_SCR_TE_Msk;
+
+    /* 2. Configure P411 as GPIO Output High for Arduino D1 UART TX */
     R_BSP_PinAccessEnable();
     R_BSP_PinCfg(BSP_IO_PORT_04_PIN_11, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_HIGH));
-    R_BSP_PinCfg(BSP_IO_PORT_01_PIN_01, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_HIGH));
     R_BSP_PinAccessDisable();
 
     PIN_411_HIGH();
-    PIN_101_HIGH();
 }
 
 void uart_logger_putc(char c)
 {
-    /* Output to SEGGER RTT Viewer */
+    /* 1. Output to SEGGER RTT Viewer */
     rtt_putc(c);
 
-    /* Output via precision bitbang UART on P411 (Arduino D1) and P101 */
+    /* 2. Output to Hardware SCI0 (J-Link CDC UART COM Port) */
+    for (uint32_t i = 0; i < 50000U; ++i)
+    {
+        if (R_SCI0->SSR & R_SCI0_SSR_TDRE_Msk)
+        {
+            R_SCI0->TDR = (uint8_t)c;
+            break;
+        }
+    }
+
+    /* 3. Output via precision bitbang UART on P411 (Arduino D1 Header) */
     uint32_t start = timer_get_cycles();
 
     /* Start bit: LOW */
     PIN_411_LOW();
-    PIN_101_LOW();
     while ((timer_get_cycles() - start) < s_bit_cycles)
     {
         __NOP();
@@ -120,12 +140,10 @@ void uart_logger_putc(char c)
         if (data & 1U)
         {
             PIN_411_HIGH();
-            PIN_101_HIGH();
         }
         else
         {
             PIN_411_LOW();
-            PIN_101_LOW();
         }
         data >>= 1;
 
@@ -138,7 +156,6 @@ void uart_logger_putc(char c)
 
     /* Stop bit: HIGH */
     PIN_411_HIGH();
-    PIN_101_HIGH();
     while ((timer_get_cycles() - start) < s_bit_cycles)
     {
         __NOP();
