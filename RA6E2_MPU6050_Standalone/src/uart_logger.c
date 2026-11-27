@@ -106,26 +106,31 @@ void uart_logger_init(uint32_t baud_rate)
     /* 2. Configure Hardware SCI0 for onboard J-Link CDC UART (P101 TXD0) */
     R_BSP_MODULE_START(FSP_IP_SCI, 0);
     R_SCI0->SCR = 0;
-    R_SCI0->FCR = 0xF800U; /* Disable FIFO for polled TDR access */
-    R_SCI0->SMR = 0;       /* Asynchronous, 8N1, no clock prescaler */
+    R_SCI0->FCR = 0;       /* Disable FIFO for clean single-byte polled access */
+    R_SCI0->SMR = 0;       /* Asynchronous, 8N1, PCLK clock */
     R_SCI0->SCMR = 0xF2U;  /* Eight bits, LSB first, normal polarity */
     R_SCI0->SEMR = R_SCI0_SEMR_BGDM_Msk;
 
     uint32_t clock = R_FSP_SystemClockHzGet(BSP_FEATURE_SCI_CLOCK);
+    if (clock == 0U)
+    {
+        clock = 100000000U; /* Default RA6E2 PCLKA = 100 MHz */
+    }
     uint32_t divisor = 16U * (baud_rate > 0U ? baud_rate : 115200U);
     if (divisor > 0)
     {
         R_SCI0->BRR = (uint8_t) ((clock + divisor / 2U) / divisor - 1U);
     }
-    R_BSP_SoftwareDelay(10U, BSP_DELAY_UNITS_MICROSECONDS);
+    R_BSP_SoftwareDelay(20U, BSP_DELAY_UNITS_MICROSECONDS);
     R_SCI0->SCR = R_SCI0_SCR_TE_Msk;
+    R_BSP_SoftwareDelay(20U, BSP_DELAY_UNITS_MICROSECONDS);
 
     /* 3. Configure Pins:
-     * P101 -> Peripheral SCI0 TXD0 (Onboard J-Link CDC UART)
+     * P101 -> Peripheral SCI0 TXD0 (Onboard J-Link CDC UART) - Push-Pull High-Drive CMOS!
      * P411 -> GPIO Output High (Arduino Header D1 TX for external USB-TTL dongle)
      */
     R_BSP_PinAccessEnable();
-    R_BSP_PinCfg(BSP_IO_PORT_01_PIN_01, (uint32_t)(IOPORT_CFG_NMOS_ENABLE | IOPORT_CFG_PERIPHERAL_PIN | IOPORT_PERIPHERAL_SCI0_2_4_6_8));
+    R_BSP_PinCfg(BSP_IO_PORT_01_PIN_01, (uint32_t)(IOPORT_CFG_PERIPHERAL_PIN | IOPORT_PERIPHERAL_SCI0_2_4_6_8 | IOPORT_CFG_DRIVE_HIGH));
     R_BSP_PinCfg(BSP_IO_PORT_04_PIN_11, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_HIGH));
     R_BSP_PinAccessDisable();
 
@@ -137,26 +142,26 @@ void uart_logger_putc(char c)
     /* 1. Send to SEGGER RTT Viewer */
     rtt_putc(c);
 
-    /* 2. Send to Hardware SCI0 (P101 / J-Link CDC UART -> PuTTY / Serial terminal) */
-    for (uint32_t i = 0; i < 50000U; ++i)
+    /* 2. Send to Hardware SCI0 (P101 / J-Link CDC UART -> PuTTY / Serial terminal)
+     * Wait until previous byte has transferred from TDR to shift register (TDRE == 1)
+     */
+    uint32_t timeout = 500000U;
+    while (((R_SCI0->SSR & R_SCI0_SSR_TDRE_Msk) == 0U) && (--timeout > 0U))
     {
-        if (R_SCI0->SSR & R_SCI0_SSR_TDRE_Msk)
-        {
-            R_SCI0->TDR = (uint8_t)c;
-            break;
-        }
+        /* Wait for TDR to be empty */
     }
 
-    /* 3. Cycle-accurate bit-bang transmission simultaneously on:
-     *    - P411 (Arduino D1 TX -> External USB-TTL dongle e.g. COM5)
-     */
+    if (timeout > 0U)
+    {
+        R_SCI0->TDR = (uint8_t)c;
+    }
+
+    /* 3. Parallel bit-bang transmission on P411 (Arduino D1 TX) */
     uint8_t b = (uint8_t)c;
 
-    /* START BIT: LOW */
     PIN_411_LOW();
     delay_cycles(s_bit_cycles);
 
-    /* 8 DATA BITS (LSB first) */
     for (int i = 0; i < 8; ++i)
     {
         if (b & 0x01)
@@ -171,7 +176,6 @@ void uart_logger_putc(char c)
         delay_cycles(s_bit_cycles);
     }
 
-    /* STOP BIT: HIGH */
     PIN_411_HIGH();
     delay_cycles(s_bit_cycles);
 }
