@@ -7,7 +7,10 @@ C_SRCS += \
 ../src/hal_entry.c \
 ../src/hal_warmstart.c \
 ../src/i2c_bus.c \
+../src/i2c_hw_iic0.c \
+../src/i2c_hw_sci9.c \
 ../src/mpu6050.c \
+../src/mpu_sensor.c \
 ../src/timer_measurement.c \
 ../src/uart_logger.c 
 
@@ -15,7 +18,10 @@ C_DEPS += \
 ./src/hal_entry.d \
 ./src/hal_warmstart.d \
 ./src/i2c_bus.d \
+./src/i2c_hw_iic0.d \
+./src/i2c_hw_sci9.d \
 ./src/mpu6050.d \
+./src/mpu_sensor.d \
 ./src/timer_measurement.d \
 ./src/uart_logger.d 
 
@@ -23,7 +29,10 @@ OBJS += \
 ./src/hal_entry.o \
 ./src/hal_warmstart.o \
 ./src/i2c_bus.o \
+./src/i2c_hw_iic0.o \
+./src/i2c_hw_sci9.o \
 ./src/mpu6050.o \
+./src/mpu_sensor.o \
 ./src/timer_measurement.o \
 ./src/uart_logger.o 
 

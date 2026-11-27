@@ -71,11 +71,74 @@ Discarded input sections
  .text          0x00000000        0x0 ./src/i2c_bus.o
  .data          0x00000000        0x0 ./src/i2c_bus.o
  .bss           0x00000000        0x0 ./src/i2c_bus.o
+ .text.i2c_write_byte
+                0x00000000      0x378 ./src/i2c_bus.o
+ .text.i2c_stop
+                0x00000000      0x170 ./src/i2c_bus.o
+ .text.i2c_start
+                0x00000000      0x1ec ./src/i2c_bus.o
+ .text.i2c_bus_recover
+                0x00000000      0x328 ./src/i2c_bus.o
+ .text.i2c_bus_init
+                0x00000000       0xd0 ./src/i2c_bus.o
  .text.i2c_init_all
                 0x00000000      0x190 ./src/i2c_bus.o
+ .text.i2c_write_reg
+                0x00000000       0x4c ./src/i2c_bus.o
+ .text.i2c_read_bytes
+                0x00000000      0x480 ./src/i2c_bus.o
+ .rodata.str1.4
+                0x00000000       0x26 ./src/i2c_bus.o
+ .data.g_i2c_bus2
+                0x00000000        0xc ./src/i2c_bus.o
+ .data.g_i2c_bus1
+                0x00000000        0xc ./src/i2c_bus.o
+ .debug_info    0x00000000     0x530d ./src/i2c_bus.o
+ .debug_abbrev  0x00000000      0x4fc ./src/i2c_bus.o
+ .debug_loclists
+                0x00000000     0x1d4e ./src/i2c_bus.o
+ .debug_aranges
+                0x00000000       0x58 ./src/i2c_bus.o
+ .debug_rnglists
+                0x00000000      0x4d0 ./src/i2c_bus.o
+ .debug_line    0x00000000     0x3439 ./src/i2c_bus.o
+ .debug_str     0x00000000     0x1c95 ./src/i2c_bus.o
+ .comment       0x00000000       0x46 ./src/i2c_bus.o
+ .debug_frame   0x00000000      0x170 ./src/i2c_bus.o
+ .ARM.attributes
+                0x00000000       0x3a ./src/i2c_bus.o
+ .text          0x00000000        0x0 ./src/i2c_hw_iic0.o
+ .data          0x00000000        0x0 ./src/i2c_hw_iic0.o
+ .bss           0x00000000        0x0 ./src/i2c_hw_iic0.o
+ .text          0x00000000        0x0 ./src/i2c_hw_sci9.o
+ .data          0x00000000        0x0 ./src/i2c_hw_sci9.o
+ .bss           0x00000000        0x0 ./src/i2c_hw_sci9.o
  .text          0x00000000        0x0 ./src/mpu6050.o
  .data          0x00000000        0x0 ./src/mpu6050.o
  .bss           0x00000000        0x0 ./src/mpu6050.o
+ .text.mpu6050_read_id
+                0x00000000       0x48 ./src/mpu6050.o
+ .text.mpu6050_init
+                0x00000000       0xb0 ./src/mpu6050.o
+ .text.mpu6050_read_all
+                0x00000000      0x120 ./src/mpu6050.o
+ .debug_info    0x00000000      0xc2b ./src/mpu6050.o
+ .debug_abbrev  0x00000000      0x1b6 ./src/mpu6050.o
+ .debug_loclists
+                0x00000000      0x115 ./src/mpu6050.o
+ .debug_aranges
+                0x00000000       0x30 ./src/mpu6050.o
+ .debug_rnglists
+                0x00000000       0x21 ./src/mpu6050.o
+ .debug_line    0x00000000      0x3b2 ./src/mpu6050.o
+ .debug_str     0x00000000     0x192d ./src/mpu6050.o
+ .comment       0x00000000       0x46 ./src/mpu6050.o
+ .debug_frame   0x00000000       0x94 ./src/mpu6050.o
+ .ARM.attributes
+                0x00000000       0x3a ./src/mpu6050.o
+ .text          0x00000000        0x0 ./src/mpu_sensor.o
+ .data          0x00000000        0x0 ./src/mpu_sensor.o
+ .bss           0x00000000        0x0 ./src/mpu_sensor.o
  .text          0x00000000        0x0 ./src/timer_measurement.o
  .data          0x00000000        0x0 ./src/timer_measurement.o
  .bss           0x00000000        0x0 ./src/timer_measurement.o
@@ -85,6 +148,8 @@ Discarded input sections
                 0x00000000        0x4 ./src/timer_measurement.o
  .text.timer_elapsed_us
                 0x00000000        0x4 ./src/timer_measurement.o
+ .text.timer_delay_us
+                0x00000000        0xc ./src/timer_measurement.o
  .text          0x00000000        0x0 ./src/uart_logger.o
  .data          0x00000000        0x0 ./src/uart_logger.o
  .bss           0x00000000        0x0 ./src/uart_logger.o
@@ -585,7 +650,10 @@ START GROUP
 LOAD ./src/hal_entry.o
 LOAD ./src/hal_warmstart.o
 LOAD ./src/i2c_bus.o
+LOAD ./src/i2c_hw_iic0.o
+LOAD ./src/i2c_hw_sci9.o
 LOAD ./src/mpu6050.o
+LOAD ./src/mpu_sensor.o
 LOAD ./src/timer_measurement.o
 LOAD ./src/uart_logger.o
 LOAD ./ra_gen/common_data.o
@@ -744,16 +812,10 @@ __ram_from_flash$$
  *(.ram_from_flash)
  *(.ram_code_from_flash)
  *(.data*)
- .data.s_sensor_center
-                0x20000000       0x38 ./src/hal_entry.o
- .data.s_sensor_neck
-                0x20000038       0x38 ./src/hal_entry.o
- .data.g_i2c_bus2
-                0x20000070        0xc ./src/i2c_bus.o
-                0x20000070                g_i2c_bus2
- .data.g_i2c_bus1
-                0x2000007c        0xc ./src/i2c_bus.o
-                0x2000007c                g_i2c_bus1
+ .data.s_sensor_bus2
+                0x20000000       0x44 ./src/hal_entry.o
+ .data.s_sensor_bus1
+                0x20000044       0x44 ./src/hal_entry.o
  .data.s_system_clock_hz
                 0x20000088        0x4 ./src/timer_measurement.o
  .data._SEGGER_RTT
@@ -839,7 +901,7 @@ __ram_thread_stack$$
                 0x20000c00                        __ddsc_RAM_NSC = .
 
 __flash_readonly$$
-                0x00000114     0x26fc
+                0x00000114     0x1dbc
                 0x00000114                        __flash_readonly$$Base = .
  *(.flash)
  *(.flash_code)
@@ -852,212 +914,210 @@ __flash_readonly$$
                 0x00000158       0x28 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtbegin.o
  .text.frame_dummy
                 0x00000180       0x24 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtbegin.o
- .text.print_sensor_reading
-                0x000001a4      0x208 ./src/hal_entry.o
+ .text.print_sensor_data
+                0x000001a4      0x1f0 ./src/hal_entry.o
  .text.hal_entry
-                0x000003ac      0x23c ./src/hal_entry.o
-                0x000003ac                hal_entry
+                0x00000394      0x21c ./src/hal_entry.o
+                0x00000394                hal_entry
  .text.R_BSP_WarmStart
-                0x000005e8       0x18 ./src/hal_warmstart.o
-                0x000005e8                R_BSP_WarmStart
- .text.i2c_write_byte
-                0x00000600      0x378 ./src/i2c_bus.o
- .text.i2c_stop
-                0x00000978      0x170 ./src/i2c_bus.o
- .text.i2c_start
-                0x00000ae8      0x1ec ./src/i2c_bus.o
- .text.i2c_bus_recover
-                0x00000cd4      0x328 ./src/i2c_bus.o
-                0x00000cd4                i2c_bus_recover
- .text.i2c_bus_init
-                0x00000ffc       0xd0 ./src/i2c_bus.o
-                0x00000ffc                i2c_bus_init
- .text.i2c_write_reg
-                0x000010cc       0x4c ./src/i2c_bus.o
-                0x000010cc                i2c_write_reg
- .text.i2c_read_bytes
-                0x00001118      0x480 ./src/i2c_bus.o
-                0x00001118                i2c_read_bytes
- .text.mpu6050_read_id
-                0x00001598       0x48 ./src/mpu6050.o
-                0x00001598                mpu6050_read_id
- .text.mpu6050_init
-                0x000015e0       0xb0 ./src/mpu6050.o
-                0x000015e0                mpu6050_init
- .text.mpu6050_read_all
-                0x00001690      0x120 ./src/mpu6050.o
-                0x00001690                mpu6050_read_all
+                0x000005b0       0x18 ./src/hal_warmstart.o
+                0x000005b0                R_BSP_WarmStart
+ .text.iic0_send_byte
+                0x000005c8       0x60 ./src/i2c_hw_iic0.o
+ .text.i2c_hw_iic0_init
+                0x00000628       0xc0 ./src/i2c_hw_iic0.o
+                0x00000628                i2c_hw_iic0_init
+ .text.i2c_hw_iic0_write_reg
+                0x000006e8       0xbc ./src/i2c_hw_iic0.o
+                0x000006e8                i2c_hw_iic0_write_reg
+ .text.i2c_hw_iic0_read_bytes
+                0x000007a4      0x120 ./src/i2c_hw_iic0.o
+                0x000007a4                i2c_hw_iic0_read_bytes
+ .text.sci9_send_byte
+                0x000008c4       0x50 ./src/i2c_hw_sci9.o
+ .text.i2c_hw_sci9_init
+                0x00000914       0xb0 ./src/i2c_hw_sci9.o
+                0x00000914                i2c_hw_sci9_init
+ .text.i2c_hw_sci9_write_reg
+                0x000009c4       0xac ./src/i2c_hw_sci9.o
+                0x000009c4                i2c_hw_sci9_write_reg
+ .text.i2c_hw_sci9_read_bytes
+                0x00000a70      0x144 ./src/i2c_hw_sci9.o
+                0x00000a70                i2c_hw_sci9_read_bytes
+ .text.mpu_init
+                0x00000bb4       0xec ./src/mpu_sensor.o
+                0x00000bb4                mpu_init
+ .text.mpu_read_all
+                0x00000ca0      0x12c ./src/mpu_sensor.o
+                0x00000ca0                mpu_read_all
  .text.timer_init
-                0x000017b0       0x20 ./src/timer_measurement.o
-                0x000017b0                timer_init
- .text.timer_delay_us
-                0x000017d0        0xc ./src/timer_measurement.o
-                0x000017d0                timer_delay_us
+                0x00000dcc       0x20 ./src/timer_measurement.o
+                0x00000dcc                timer_init
  .text.timer_delay_ms
-                0x000017dc        0xc ./src/timer_measurement.o
-                0x000017dc                timer_delay_ms
+                0x00000dec        0xc ./src/timer_measurement.o
+                0x00000dec                timer_delay_ms
  .text.timer_get_system_clock_hz
-                0x000017e8        0xc ./src/timer_measurement.o
-                0x000017e8                timer_get_system_clock_hz
+                0x00000df8        0xc ./src/timer_measurement.o
+                0x00000df8                timer_get_system_clock_hz
  .text.uart_logger_init
-                0x000017f4      0x134 ./src/uart_logger.o
-                0x000017f4                uart_logger_init
+                0x00000e04      0x134 ./src/uart_logger.o
+                0x00000e04                uart_logger_init
  .text.uart_logger_putc
-                0x00001928       0x94 ./src/uart_logger.o
-                0x00001928                uart_logger_putc
+                0x00000f38       0x94 ./src/uart_logger.o
+                0x00000f38                uart_logger_putc
  .text.uart_logger_print
-                0x000019bc       0x3c ./src/uart_logger.o
-                0x000019bc                uart_logger_print
+                0x00000fcc       0x3c ./src/uart_logger.o
+                0x00000fcc                uart_logger_print
  .text.uart_logger_println
-                0x000019f8       0x48 ./src/uart_logger.o
-                0x000019f8                uart_logger_println
+                0x00001008       0x48 ./src/uart_logger.o
+                0x00001008                uart_logger_println
  .text.uart_logger_print_u32
-                0x00001a40       0x4c ./src/uart_logger.o
-                0x00001a40                uart_logger_print_u32
+                0x00001050       0x4c ./src/uart_logger.o
+                0x00001050                uart_logger_print_u32
  .text.uart_logger_print_i16
-                0x00001a8c       0x24 ./src/uart_logger.o
-                0x00001a8c                uart_logger_print_i16
+                0x0000109c       0x24 ./src/uart_logger.o
+                0x0000109c                uart_logger_print_i16
  .text.uart_logger_print_hex8
-                0x00001ab0       0x6c ./src/uart_logger.o
-                0x00001ab0                uart_logger_print_hex8
+                0x000010c0       0x6c ./src/uart_logger.o
+                0x000010c0                uart_logger_print_hex8
  .text.uart_logger_print_float
-                0x00001b1c       0x74 ./src/uart_logger.o
-                0x00001b1c                uart_logger_print_float
+                0x0000112c       0x74 ./src/uart_logger.o
+                0x0000112c                uart_logger_print_float
  .text.startup.main
-                0x00001b90        0xc ./ra_gen/main.o
-                0x00001b90                main
+                0x000011a0        0xc ./ra_gen/main.o
+                0x000011a0                main
  .text.bsp_vbatt_init
-                0x00001b9c       0x8c ./ra/fsp/src/r_ioport/r_ioport.o
+                0x000011ac       0x8c ./ra/fsp/src/r_ioport/r_ioport.o
  .text.r_ioport_pins_config
-                0x00001c28       0xac ./ra/fsp/src/r_ioport/r_ioport.o
+                0x00001238       0xac ./ra/fsp/src/r_ioport/r_ioport.o
  .text.R_IOPORT_Open
-                0x00001cd4       0x14 ./ra/fsp/src/r_ioport/r_ioport.o
-                0x00001cd4                R_IOPORT_Open
+                0x000012e4       0x14 ./ra/fsp/src/r_ioport/r_ioport.o
+                0x000012e4                R_IOPORT_Open
  .text.SystemCoreClockUpdate
-                0x00001ce8       0x28 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
-                0x00001ce8                SystemCoreClockUpdate
+                0x000012f8       0x28 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+                0x000012f8                SystemCoreClockUpdate
  .text.R_BSP_SubClockStabilizeWaitAfterReset
-                0x00001d10        0x4 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
-                0x00001d10                R_BSP_SubClockStabilizeWaitAfterReset
+                0x00001320        0x4 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+                0x00001320                R_BSP_SubClockStabilizeWaitAfterReset
  .text.bsp_clock_init
-                0x00001d14      0x128 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
-                0x00001d14                bsp_clock_init
+                0x00001324      0x128 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+                0x00001324                bsp_clock_init
  .text.R_BSP_Init_RTC
-                0x00001e3c       0x7c ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
-                0x00001e3c                R_BSP_Init_RTC
+                0x0000144c       0x7c ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+                0x0000144c                R_BSP_Init_RTC
  .text.bsp_prv_software_delay_loop
-                0x00001eb8        0xc ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
-                0x00001eb8                bsp_prv_software_delay_loop
+                0x000014c8        0xc ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+                0x000014c8                bsp_prv_software_delay_loop
  .text.R_BSP_SoftwareDelay
-                0x00001ec4       0x8c ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
-                0x00001ec4                R_BSP_SoftwareDelay
+                0x000014d4       0x8c ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+                0x000014d4                R_BSP_SoftwareDelay
  .text.NMI_Handler
-                0x00001f50       0x3c ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
-                0x00001f50                NMI_Handler
+                0x00001560       0x3c ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+                0x00001560                NMI_Handler
  .text.bsp_irq_cfg
-                0x00001f8c       0x68 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
-                0x00001f8c                bsp_irq_cfg
+                0x0000159c       0x68 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+                0x0000159c                bsp_irq_cfg
  .text.R_BSP_RegisterProtectEnable
-                0x00001ff4       0x60 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
-                0x00001ff4                R_BSP_RegisterProtectEnable
+                0x00001604       0x60 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+                0x00001604                R_BSP_RegisterProtectEnable
  .text.R_BSP_RegisterProtectDisable
-                0x00002054       0x54 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
-                0x00002054                R_BSP_RegisterProtectDisable
+                0x00001664       0x54 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+                0x00001664                R_BSP_RegisterProtectDisable
  .text.Default_Handler
-                0x000020a8        0x4 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
-                0x000020a8                DebugMon_Handler
-                0x000020a8                HardFault_Handler
-                0x000020a8                SysTick_Handler
-                0x000020a8                PendSV_Handler
-                0x000020a8                UsageFault_Handler
-                0x000020a8                SecureFault_Handler
-                0x000020a8                Default_Handler
-                0x000020a8                MemManage_Handler
-                0x000020a8                SVC_Handler
-                0x000020a8                BusFault_Handler
+                0x000016b8        0x4 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+                0x000016b8                DebugMon_Handler
+                0x000016b8                HardFault_Handler
+                0x000016b8                SysTick_Handler
+                0x000016b8                PendSV_Handler
+                0x000016b8                UsageFault_Handler
+                0x000016b8                SecureFault_Handler
+                0x000016b8                Default_Handler
+                0x000016b8                MemManage_Handler
+                0x000016b8                SVC_Handler
+                0x000016b8                BusFault_Handler
  .text.Reset_Handler
-                0x000020ac        0xc ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
-                0x000020ac                Reset_Handler
+                0x000016bc        0xc ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+                0x000016bc                Reset_Handler
  .text.SystemRuntimeInit
-                0x000020b8       0x64 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+                0x000016c8       0x64 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
  .text.SystemInit
-                0x0000211c       0xc0 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
-                0x0000211c                SystemInit
+                0x0000172c       0xc0 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+                0x0000172c                SystemInit
  .text.bsp_init
-                0x000021dc        0x4 ./ra/board/ra6e2_bgk/board_init.o
-                0x000021dc                bsp_init
- .text.memset   0x000021e0       0x10 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memset.o)
-                0x000021e0                memset
- .text.memcpy   0x000021f0       0x1a C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memcpy-stub.o)
-                0x000021f0                memcpy
+                0x000017ec        0x4 ./ra/board/ra6e2_bgk/board_init.o
+                0x000017ec                bsp_init
+ .text.memset   0x000017f0       0x10 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memset.o)
+                0x000017f0                memset
+ .text.memcpy   0x00001800       0x1a C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memcpy-stub.o)
+                0x00001800                memcpy
  *(.rodata*)
- *fill*         0x0000220a        0x2 
- .rodata.print_sensor_reading.str1.4
-                0x0000220c      0x3fd ./src/hal_entry.o
-                                0x12a (size before relaxing)
+ *fill*         0x0000181a        0x2 
+ .rodata.print_sensor_data.str1.4
+                0x0000181c      0x4ad ./src/hal_entry.o
+                                0x11c (size before relaxing)
  .rodata.hal_entry.str1.4
-                0x00002609      0x26b ./src/hal_entry.o
+                0x00001cc9      0x31b ./src/hal_entry.o
  .rodata.str1.4
-                0x00002609       0x1d ./src/hal_entry.o
- .rodata.str1.4
-                0x00002609       0x26 ./src/i2c_bus.o
+                0x00001cc9       0x2d ./src/hal_entry.o
+ .rodata.mpu_init.str1.4
+                0x00001cc9       0x38 ./src/mpu_sensor.o
  .rodata.uart_logger_print_hex8.str1.4
-                0x00002609       0x15 ./src/uart_logger.o
+                0x00001cc9       0x15 ./src/uart_logger.o
  .rodata.str1.4
-                0x00002609        0x9 ./src/uart_logger.o
- *fill*         0x00002609        0x3 
+                0x00001cc9        0x9 ./src/uart_logger.o
+ *fill*         0x00001cc9        0x3 
  .rodata.g_bsp_pin_cfg
-                0x0000260c        0xc ./ra_gen/pin_data.o
-                0x0000260c                g_bsp_pin_cfg
+                0x00001ccc        0xc ./ra_gen/pin_data.o
+                0x00001ccc                g_bsp_pin_cfg
  .rodata.g_bsp_pin_cfg_data
-                0x00002618      0x128 ./ra_gen/pin_data.o
-                0x00002618                g_bsp_pin_cfg_data
+                0x00001cd8      0x128 ./ra_gen/pin_data.o
+                0x00001cd8                g_bsp_pin_cfg_data
  .rodata.g_vbatt_pins_input
-                0x00002740        0x6 ./ra/fsp/src/r_ioport/r_ioport.o
- *fill*         0x00002746        0x2 
+                0x00001e00        0x6 ./ra/fsp/src/r_ioport/r_ioport.o
+ *fill*         0x00001e06        0x2 
  .rodata.g_init_info
-                0x00002748       0x18 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
-                0x00002748                g_init_info
+                0x00001e08       0x18 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+                0x00001e08                g_init_info
  .rodata.nocache_list
-                0x00002760        0x8 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+                0x00001e20        0x8 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
  .rodata.copy_list
-                0x00002768       0x30 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+                0x00001e28       0x30 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
  .rodata.zero_list
-                0x00002798       0x18 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+                0x00001e58       0x18 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
  .rodata.g_interrupt_event_link_select
-                0x000027b0        0x2 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
-                0x000027b0                g_interrupt_event_link_select
- *fill*         0x000027b2        0x2 
+                0x00001e70        0x2 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+                0x00001e70                g_interrupt_event_link_select
+ *fill*         0x00001e72        0x2 
  .rodata.g_prcr_masks
-                0x000027b4        0xa ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+                0x00001e74        0xa ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
  *(.mcuboot_sce9_key)
  *(.version)
- *fill*         0x000027be        0x2 
- .version       0x000027c0       0x50 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
-                0x00002810                        __flash_readonly$$Limit = .
+ *fill*         0x00001e7e        0x2 
+ .version       0x00001e80       0x50 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+                0x00001ed0                        __flash_readonly$$Limit = .
 
-.glue_7         0x00002810        0x0
- .glue_7        0x00002810        0x0 linker stubs
+.glue_7         0x00001ed0        0x0
+ .glue_7        0x00001ed0        0x0 linker stubs
 
-.glue_7t        0x00002810        0x0
- .glue_7t       0x00002810        0x0 linker stubs
+.glue_7t        0x00001ed0        0x0
+ .glue_7t       0x00001ed0        0x0 linker stubs
 
-.vfp11_veneer   0x00002810        0x0
- .vfp11_veneer  0x00002810        0x0 linker stubs
+.vfp11_veneer   0x00001ed0        0x0
+ .vfp11_veneer  0x00001ed0        0x0 linker stubs
 
-.v4_bx          0x00002810        0x0
- .v4_bx         0x00002810        0x0 linker stubs
+.v4_bx          0x00001ed0        0x0
+ .v4_bx         0x00001ed0        0x0 linker stubs
 
-.init           0x00002810        0x4
- .init          0x00002810        0x4 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crti.o
-                0x00002810                _init
+.init           0x00001ed0        0x4
+ .init          0x00001ed0        0x4 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crti.o
+                0x00001ed0                _init
 
-.fini           0x00002814        0x4
- .fini          0x00002814        0x4 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crti.o
-                0x00002814                _fini
+.fini           0x00001ed4        0x4
+ .fini          0x00001ed4        0x4 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crti.o
+                0x00001ed4                _fini
 
-.iplt           0x00002818        0x0
- .iplt          0x00002818        0x0 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtbegin.o
+.iplt           0x00001ed8        0x0
+ .iplt          0x00001ed8        0x0 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtbegin.o
 
 __flash_ctor$$
  *crtbegin.o(.ctors)
@@ -1072,48 +1132,48 @@ __flash_ctor$$
  *(.dtors)
 
 __flash_preinit_array$$
-                0x00002818        0x0
-                0x00002818                        __preinit_array_start = .
+                0x00001ed8        0x0
+                0x00001ed8                        __preinit_array_start = .
  *(.preinit_array)
-                0x00002818                        __preinit_array_end = .
+                0x00001ed8                        __preinit_array_end = .
 
 __flash_.got$$
  *(.got.plt)
  *(.got)
 
 __flash_init_array$$
-                0x00002818        0x4
-                0x00002818                        __init_array_start = .
+                0x00001ed8        0x4
+                0x00001ed8                        __init_array_start = .
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array)
- .init_array    0x00002818        0x4 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtbegin.o
-                0x0000281c                        __init_array_end = .
+ .init_array    0x00001ed8        0x4 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtbegin.o
+                0x00001edc                        __init_array_end = .
 
 __flash_fini_array$$
-                0x0000281c        0x4
-                0x0000281c                        __fini_array_start = .
+                0x00001edc        0x4
+                0x00001edc                        __fini_array_start = .
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array)
- .fini_array    0x0000281c        0x4 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtbegin.o
-                0x00002820                        __fini_array_end = .
+ .fini_array    0x00001edc        0x4 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtbegin.o
+                0x00001ee0                        __fini_array_end = .
 
 __flash_arm.extab$$
  *(.ARM.extab*)
  *(.gnu.linkonce.armextab.*)
 
 __flash_arm.exidx$$
-                0x00002820        0x0
-                0x00002820                        __exidx_start = .
+                0x00001ee0        0x0
+                0x00001ee0                        __exidx_start = .
  *(.ARM.exidx*)
  *(.gnu.linkonce.armexidx.*)
-                0x00002820                        __exidx_end = .
+                0x00001ee0                        __exidx_end = .
 
-.flash.endof    0x00002c00        0x0
-                0x00002c00                        __ddsc_FLASH_END = .
+.flash.endof    0x00002000        0x0
+                0x00002000                        __ddsc_FLASH_END = .
 
 .flash.flat_nsc
-                0x00002c00        0x0
-                0x00002c00                        __ddsc_FLASH_NSC = .
+                0x00002000        0x0
+                0x00002000                        __ddsc_FLASH_NSC = .
 
 .option_setting_ofs0.startof
                 0x0100a100        0x0
@@ -1208,56 +1268,59 @@ LOAD linker stubs
  .ARM.attributes
                 0x00000098       0x3a ./src/hal_warmstart.o
  .ARM.attributes
-                0x000000d2       0x3a ./src/i2c_bus.o
+                0x000000d2       0x3a ./src/i2c_hw_iic0.o
  .ARM.attributes
-                0x0000010c       0x3a ./src/mpu6050.o
+                0x0000010c       0x3a ./src/i2c_hw_sci9.o
  .ARM.attributes
-                0x00000146       0x3a ./src/timer_measurement.o
+                0x00000146       0x3a ./src/mpu_sensor.o
  .ARM.attributes
-                0x00000180       0x3a ./src/uart_logger.o
+                0x00000180       0x3a ./src/timer_measurement.o
  .ARM.attributes
-                0x000001ba       0x3a ./ra_gen/common_data.o
+                0x000001ba       0x3a ./src/uart_logger.o
  .ARM.attributes
-                0x000001f4       0x3a ./ra_gen/main.o
+                0x000001f4       0x3a ./ra_gen/common_data.o
  .ARM.attributes
-                0x0000022e       0x3a ./ra_gen/pin_data.o
+                0x0000022e       0x3a ./ra_gen/main.o
  .ARM.attributes
-                0x00000268       0x3a ./ra/fsp/src/r_ioport/r_ioport.o
+                0x00000268       0x3a ./ra_gen/pin_data.o
  .ARM.attributes
-                0x000002a2       0x3a ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+                0x000002a2       0x3a ./ra/fsp/src/r_ioport/r_ioport.o
  .ARM.attributes
-                0x000002dc       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+                0x000002dc       0x3a ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
  .ARM.attributes
-                0x00000316       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+                0x00000316       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
  .ARM.attributes
-                0x00000350       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+                0x00000350       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_common.o
  .ARM.attributes
-                0x0000038a       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+                0x0000038a       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
  .ARM.attributes
-                0x000003c4       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_io.o
+                0x000003c4       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
  .ARM.attributes
-                0x000003fe       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+                0x000003fe       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_io.o
  .ARM.attributes
-                0x00000438       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+                0x00000438       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
  .ARM.attributes
-                0x00000472       0x3a ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+                0x00000472       0x3a ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
  .ARM.attributes
-                0x000004ac       0x3a ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+                0x000004ac       0x3a ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
  .ARM.attributes
-                0x000004e6       0x3a ./ra/board/ra6e2_bgk/board_init.o
+                0x000004e6       0x3a ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
  .ARM.attributes
-                0x00000520       0x38 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memset.o)
+                0x00000520       0x3a ./ra/board/ra6e2_bgk/board_init.o
  .ARM.attributes
-                0x00000558       0x38 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memcpy-stub.o)
+                0x0000055a       0x38 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memset.o)
  .ARM.attributes
-                0x00000590       0x38 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtend.o
+                0x00000592       0x38 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memcpy-stub.o)
+ .ARM.attributes
+                0x000005ca       0x38 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard/crtend.o
 
 .comment        0x00000000       0x45
  .comment       0x00000000       0x45 ./src/hal_entry.o
                                  0x46 (size before relaxing)
  .comment       0x00000045       0x46 ./src/hal_warmstart.o
- .comment       0x00000045       0x46 ./src/i2c_bus.o
- .comment       0x00000045       0x46 ./src/mpu6050.o
+ .comment       0x00000045       0x46 ./src/i2c_hw_iic0.o
+ .comment       0x00000045       0x46 ./src/i2c_hw_sci9.o
+ .comment       0x00000045       0x46 ./src/mpu_sensor.o
  .comment       0x00000045       0x46 ./src/timer_measurement.o
  .comment       0x00000045       0x46 ./src/uart_logger.o
  .comment       0x00000045       0x46 ./ra_gen/common_data.o
@@ -1276,231 +1339,242 @@ LOAD linker stubs
  .comment       0x00000045       0x46 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
  .comment       0x00000045       0x46 ./ra/board/ra6e2_bgk/board_init.o
 
-.debug_info     0x00000000    0x25292
- .debug_info    0x00000000     0x1ca4 ./src/hal_entry.o
- .debug_info    0x00001ca4      0xff8 ./src/hal_warmstart.o
- .debug_info    0x00002c9c     0x530d ./src/i2c_bus.o
- .debug_info    0x00007fa9      0xc2b ./src/mpu6050.o
- .debug_info    0x00008bd4      0x23b ./src/timer_measurement.o
- .debug_info    0x00008e0f     0x81c8 ./src/uart_logger.o
- .debug_info    0x00010fd7     0x125c ./ra_gen/common_data.o
- .debug_info    0x00012233       0xaa ./ra_gen/main.o
- .debug_info    0x000122dd      0xa31 ./ra_gen/pin_data.o
- .debug_info    0x00012d0e     0x4049 ./ra/fsp/src/r_ioport/r_ioport.o
- .debug_info    0x00016d57      0x3f8 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
- .debug_info    0x0001714f     0x5762 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
- .debug_info    0x0001c8b1      0x96f ./ra/fsp/src/bsp/mcu/all/bsp_common.o
- .debug_info    0x0001d220      0x204 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
- .debug_info    0x0001d424     0x1363 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
- .debug_info    0x0001e787       0xb2 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
- .debug_info    0x0001e839     0x1d18 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
- .debug_info    0x00020551     0x3912 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
- .debug_info    0x00023e63      0x187 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
- .debug_info    0x00023fea     0x1203 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
- .debug_info    0x000251ed       0xa5 ./ra/board/ra6e2_bgk/board_init.o
+.debug_info     0x00000000    0x27eb1
+ .debug_info    0x00000000     0x1c7b ./src/hal_entry.o
+ .debug_info    0x00001c7b      0xff8 ./src/hal_warmstart.o
+ .debug_info    0x00002c73     0x4f10 ./src/i2c_hw_iic0.o
+ .debug_info    0x00007b83     0x389d ./src/i2c_hw_sci9.o
+ .debug_info    0x0000b420      0x3d3 ./src/mpu_sensor.o
+ .debug_info    0x0000b7f3      0x23b ./src/timer_measurement.o
+ .debug_info    0x0000ba2e     0x81c8 ./src/uart_logger.o
+ .debug_info    0x00013bf6     0x125c ./ra_gen/common_data.o
+ .debug_info    0x00014e52       0xaa ./ra_gen/main.o
+ .debug_info    0x00014efc      0xa31 ./ra_gen/pin_data.o
+ .debug_info    0x0001592d     0x4049 ./ra/fsp/src/r_ioport/r_ioport.o
+ .debug_info    0x00019976      0x3f8 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+ .debug_info    0x00019d6e     0x5762 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+ .debug_info    0x0001f4d0      0x96f ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+ .debug_info    0x0001fe3f      0x204 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+ .debug_info    0x00020043     0x1363 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+ .debug_info    0x000213a6       0xb2 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
+ .debug_info    0x00021458     0x1d18 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+ .debug_info    0x00023170     0x3912 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+ .debug_info    0x00026a82      0x187 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+ .debug_info    0x00026c09     0x1203 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_info    0x00027e0c       0xa5 ./ra/board/ra6e2_bgk/board_init.o
 
-.debug_abbrev   0x00000000     0x2e0f
- .debug_abbrev  0x00000000      0x3e9 ./src/hal_entry.o
- .debug_abbrev  0x000003e9      0x158 ./src/hal_warmstart.o
- .debug_abbrev  0x00000541      0x4fc ./src/i2c_bus.o
- .debug_abbrev  0x00000a3d      0x1b6 ./src/mpu6050.o
- .debug_abbrev  0x00000bf3      0x1bf ./src/timer_measurement.o
- .debug_abbrev  0x00000db2      0x532 ./src/uart_logger.o
- .debug_abbrev  0x000012e4      0x13a ./ra_gen/common_data.o
- .debug_abbrev  0x0000141e       0x61 ./ra_gen/main.o
- .debug_abbrev  0x0000147f       0xff ./ra_gen/pin_data.o
- .debug_abbrev  0x0000157e      0x479 ./ra/fsp/src/r_ioport/r_ioport.o
- .debug_abbrev  0x000019f7       0xe3 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
- .debug_abbrev  0x00001ada      0x400 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
- .debug_abbrev  0x00001eda      0x188 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
- .debug_abbrev  0x00002062      0x10d ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
- .debug_abbrev  0x0000216f      0x25c ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
- .debug_abbrev  0x000023cb       0x5e ./ra/fsp/src/bsp/mcu/all/bsp_io.o
- .debug_abbrev  0x00002429      0x28b ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
- .debug_abbrev  0x000026b4      0x283 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
- .debug_abbrev  0x00002937      0x102 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
- .debug_abbrev  0x00002a39      0x37b ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
- .debug_abbrev  0x00002db4       0x5b ./ra/board/ra6e2_bgk/board_init.o
+.debug_abbrev   0x00000000     0x3067
+ .debug_abbrev  0x00000000      0x3ba ./src/hal_entry.o
+ .debug_abbrev  0x000003ba      0x158 ./src/hal_warmstart.o
+ .debug_abbrev  0x00000512      0x3f5 ./src/i2c_hw_iic0.o
+ .debug_abbrev  0x00000907      0x3e0 ./src/i2c_hw_sci9.o
+ .debug_abbrev  0x00000ce7      0x164 ./src/mpu_sensor.o
+ .debug_abbrev  0x00000e4b      0x1bf ./src/timer_measurement.o
+ .debug_abbrev  0x0000100a      0x532 ./src/uart_logger.o
+ .debug_abbrev  0x0000153c      0x13a ./ra_gen/common_data.o
+ .debug_abbrev  0x00001676       0x61 ./ra_gen/main.o
+ .debug_abbrev  0x000016d7       0xff ./ra_gen/pin_data.o
+ .debug_abbrev  0x000017d6      0x479 ./ra/fsp/src/r_ioport/r_ioport.o
+ .debug_abbrev  0x00001c4f       0xe3 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+ .debug_abbrev  0x00001d32      0x400 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+ .debug_abbrev  0x00002132      0x188 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+ .debug_abbrev  0x000022ba      0x10d ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+ .debug_abbrev  0x000023c7      0x25c ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+ .debug_abbrev  0x00002623       0x5e ./ra/fsp/src/bsp/mcu/all/bsp_io.o
+ .debug_abbrev  0x00002681      0x28b ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+ .debug_abbrev  0x0000290c      0x283 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+ .debug_abbrev  0x00002b8f      0x102 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+ .debug_abbrev  0x00002c91      0x37b ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_abbrev  0x0000300c       0x5b ./ra/board/ra6e2_bgk/board_init.o
 
 .debug_loclists
-                0x00000000     0x366a
+                0x00000000     0x239e
  .debug_loclists
-                0x00000000      0x318 ./src/hal_entry.o
+                0x00000000      0x32c ./src/hal_entry.o
  .debug_loclists
-                0x00000318       0x29 ./src/hal_warmstart.o
+                0x0000032c       0x29 ./src/hal_warmstart.o
  .debug_loclists
-                0x00000341     0x1d4e ./src/i2c_bus.o
+                0x00000355      0x5af ./src/i2c_hw_iic0.o
  .debug_loclists
-                0x0000208f      0x115 ./src/mpu6050.o
+                0x00000904      0x4b7 ./src/i2c_hw_sci9.o
  .debug_loclists
-                0x000021a4       0x80 ./src/timer_measurement.o
+                0x00000dbb      0x11d ./src/mpu_sensor.o
  .debug_loclists
-                0x00002224      0x5e4 ./src/uart_logger.o
+                0x00000ed8       0x80 ./src/timer_measurement.o
  .debug_loclists
-                0x00002808      0x7a2 ./ra/fsp/src/r_ioport/r_ioport.o
+                0x00000f58      0x5e4 ./src/uart_logger.o
  .debug_loclists
-                0x00002faa      0x2ce ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+                0x0000153c      0x7a2 ./ra/fsp/src/r_ioport/r_ioport.o
  .debug_loclists
-                0x00003278       0x20 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+                0x00001cde      0x2ce ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
  .debug_loclists
-                0x00003298      0x1a5 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+                0x00001fac       0x20 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
  .debug_loclists
-                0x0000343d       0x73 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+                0x00001fcc      0x1a5 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
  .debug_loclists
-                0x000034b0       0x76 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+                0x00002171       0x73 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
  .debug_loclists
-                0x00003526       0xa7 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+                0x000021e4       0x76 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
  .debug_loclists
-                0x000035cd       0x9d ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+                0x0000225a       0xa7 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+ .debug_loclists
+                0x00002301       0x9d ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
 
-.debug_aranges  0x00000000      0x448
+.debug_aranges  0x00000000      0x458
  .debug_aranges
                 0x00000000       0x28 ./src/hal_entry.o
  .debug_aranges
                 0x00000028       0x20 ./src/hal_warmstart.o
  .debug_aranges
-                0x00000048       0x58 ./src/i2c_bus.o
+                0x00000048       0x38 ./src/i2c_hw_iic0.o
  .debug_aranges
-                0x000000a0       0x30 ./src/mpu6050.o
+                0x00000080       0x38 ./src/i2c_hw_sci9.o
  .debug_aranges
-                0x000000d0       0x50 ./src/timer_measurement.o
+                0x000000b8       0x28 ./src/mpu_sensor.o
  .debug_aranges
-                0x00000120       0x60 ./src/uart_logger.o
+                0x000000e0       0x50 ./src/timer_measurement.o
  .debug_aranges
-                0x00000180       0x20 ./ra_gen/common_data.o
+                0x00000130       0x60 ./src/uart_logger.o
  .debug_aranges
-                0x000001a0       0x20 ./ra_gen/main.o
+                0x00000190       0x20 ./ra_gen/common_data.o
  .debug_aranges
-                0x000001c0       0x18 ./ra_gen/pin_data.o
+                0x000001b0       0x20 ./ra_gen/main.o
  .debug_aranges
-                0x000001d8       0x90 ./ra/fsp/src/r_ioport/r_ioport.o
+                0x000001d0       0x18 ./ra_gen/pin_data.o
  .debug_aranges
-                0x00000268       0x18 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+                0x000001e8       0x90 ./ra/fsp/src/r_ioport/r_ioport.o
  .debug_aranges
-                0x00000280       0x70 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+                0x00000278       0x18 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
  .debug_aranges
-                0x000002f0       0x30 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+                0x00000290       0x70 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
  .debug_aranges
-                0x00000320       0x28 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+                0x00000300       0x30 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
  .debug_aranges
-                0x00000348       0x28 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+                0x00000330       0x28 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
  .debug_aranges
-                0x00000370       0x18 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
+                0x00000358       0x28 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
  .debug_aranges
-                0x00000388       0x20 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+                0x00000380       0x18 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
  .debug_aranges
-                0x000003a8       0x28 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+                0x00000398       0x20 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
  .debug_aranges
-                0x000003d0       0x28 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+                0x000003b8       0x28 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
  .debug_aranges
-                0x000003f8       0x30 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+                0x000003e0       0x28 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
  .debug_aranges
-                0x00000428       0x20 ./ra/board/ra6e2_bgk/board_init.o
+                0x00000408       0x30 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_aranges
+                0x00000438       0x20 ./ra/board/ra6e2_bgk/board_init.o
 
 .debug_rnglists
-                0x00000000      0x9ff
+                0x00000000      0x674
  .debug_rnglists
-                0x00000000       0x9a ./src/hal_entry.o
+                0x00000000       0x89 ./src/hal_entry.o
  .debug_rnglists
-                0x0000009a       0x13 ./src/hal_warmstart.o
+                0x00000089       0x13 ./src/hal_warmstart.o
  .debug_rnglists
-                0x000000ad      0x4d0 ./src/i2c_bus.o
+                0x0000009c       0xa1 ./src/i2c_hw_iic0.o
  .debug_rnglists
-                0x0000057d       0x21 ./src/mpu6050.o
+                0x0000013d       0xbb ./src/i2c_hw_sci9.o
  .debug_rnglists
-                0x0000059e       0x37 ./src/timer_measurement.o
+                0x000001f8       0x1b ./src/mpu_sensor.o
  .debug_rnglists
-                0x000005d5      0x105 ./src/uart_logger.o
+                0x00000213       0x37 ./src/timer_measurement.o
  .debug_rnglists
-                0x000006da       0x13 ./ra_gen/common_data.o
+                0x0000024a      0x105 ./src/uart_logger.o
  .debug_rnglists
-                0x000006ed       0x13 ./ra_gen/main.o
+                0x0000034f       0x13 ./ra_gen/common_data.o
  .debug_rnglists
-                0x00000700       0xbb ./ra/fsp/src/r_ioport/r_ioport.o
+                0x00000362       0x13 ./ra_gen/main.o
  .debug_rnglists
-                0x000007bb       0xf0 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+                0x00000375       0xbb ./ra/fsp/src/r_ioport/r_ioport.o
  .debug_rnglists
-                0x000008ab       0x1f ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+                0x00000430       0xf0 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
  .debug_rnglists
-                0x000008ca       0x35 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+                0x00000520       0x1f ./ra/fsp/src/bsp/mcu/all/bsp_common.o
  .debug_rnglists
-                0x000008ff       0x37 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+                0x0000053f       0x35 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
  .debug_rnglists
-                0x00000936       0x31 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+                0x00000574       0x37 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
  .debug_rnglists
-                0x00000967       0x31 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+                0x000005ab       0x31 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
  .debug_rnglists
-                0x00000998       0x19 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+                0x000005dc       0x31 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
  .debug_rnglists
-                0x000009b1       0x3b ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+                0x0000060d       0x19 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
  .debug_rnglists
-                0x000009ec       0x13 ./ra/board/ra6e2_bgk/board_init.o
+                0x00000626       0x3b ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_rnglists
+                0x00000661       0x13 ./ra/board/ra6e2_bgk/board_init.o
 
-.debug_line     0x00000000     0x81bc
- .debug_line    0x00000000      0x6de ./src/hal_entry.o
- .debug_line    0x000006de      0x2d6 ./src/hal_warmstart.o
- .debug_line    0x000009b4     0x3439 ./src/i2c_bus.o
- .debug_line    0x00003ded      0x3b2 ./src/mpu6050.o
- .debug_line    0x0000419f      0x2a2 ./src/timer_measurement.o
- .debug_line    0x00004441      0x9f9 ./src/uart_logger.o
- .debug_line    0x00004e3a      0x277 ./ra_gen/common_data.o
- .debug_line    0x000050b1       0x5e ./ra_gen/main.o
- .debug_line    0x0000510f      0x1f2 ./ra_gen/pin_data.o
- .debug_line    0x00005301      0xa89 ./ra/fsp/src/r_ioport/r_ioport.o
- .debug_line    0x00005d8a      0x13b ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
- .debug_line    0x00005ec5      0x95b ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
- .debug_line    0x00006820      0x280 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
- .debug_line    0x00006aa0      0x2c3 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
- .debug_line    0x00006d63      0x2ea ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
- .debug_line    0x0000704d      0x16a ./ra/fsp/src/bsp/mcu/all/bsp_io.o
- .debug_line    0x000071b7      0x434 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
- .debug_line    0x000075eb      0x3a2 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
- .debug_line    0x0000798d      0x1d6 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
- .debug_line    0x00007b63      0x5fe ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
- .debug_line    0x00008161       0x5b ./ra/board/ra6e2_bgk/board_init.o
+.debug_line     0x00000000     0x615b
+ .debug_line    0x00000000      0x68a ./src/hal_entry.o
+ .debug_line    0x0000068a      0x2d6 ./src/hal_warmstart.o
+ .debug_line    0x00000960      0xa4c ./src/i2c_hw_iic0.o
+ .debug_line    0x000013ac      0xa4c ./src/i2c_hw_sci9.o
+ .debug_line    0x00001df8      0x346 ./src/mpu_sensor.o
+ .debug_line    0x0000213e      0x2a2 ./src/timer_measurement.o
+ .debug_line    0x000023e0      0x9f9 ./src/uart_logger.o
+ .debug_line    0x00002dd9      0x277 ./ra_gen/common_data.o
+ .debug_line    0x00003050       0x5e ./ra_gen/main.o
+ .debug_line    0x000030ae      0x1f2 ./ra_gen/pin_data.o
+ .debug_line    0x000032a0      0xa89 ./ra/fsp/src/r_ioport/r_ioport.o
+ .debug_line    0x00003d29      0x13b ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+ .debug_line    0x00003e64      0x95b ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+ .debug_line    0x000047bf      0x280 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+ .debug_line    0x00004a3f      0x2c3 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+ .debug_line    0x00004d02      0x2ea ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+ .debug_line    0x00004fec      0x16a ./ra/fsp/src/bsp/mcu/all/bsp_io.o
+ .debug_line    0x00005156      0x434 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+ .debug_line    0x0000558a      0x3a2 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+ .debug_line    0x0000592c      0x1d6 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+ .debug_line    0x00005b02      0x5fe ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_line    0x00006100       0x5b ./ra/board/ra6e2_bgk/board_init.o
 
-.debug_str      0x00000000     0xa17e
- .debug_str     0x00000000     0xa17e ./src/hal_entry.o
-                               0x1dd6 (size before relaxing)
- .debug_str     0x0000a17e     0x321d ./src/hal_warmstart.o
- .debug_str     0x0000a17e     0x1c95 ./src/i2c_bus.o
- .debug_str     0x0000a17e     0x192d ./src/mpu6050.o
- .debug_str     0x0000a17e      0x334 ./src/timer_measurement.o
- .debug_str     0x0000a17e     0x49ac ./src/uart_logger.o
- .debug_str     0x0000a17e     0x33e8 ./ra_gen/common_data.o
- .debug_str     0x0000a17e      0x1d6 ./ra_gen/main.o
- .debug_str     0x0000a17e     0x1dac ./ra_gen/pin_data.o
- .debug_str     0x0000a17e     0x4558 ./ra/fsp/src/r_ioport/r_ioport.o
- .debug_str     0x0000a17e      0x624 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
- .debug_str     0x0000a17e     0x2748 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
- .debug_str     0x0000a17e     0x1cdd ./ra/fsp/src/bsp/mcu/all/bsp_common.o
- .debug_str     0x0000a17e      0x326 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
- .debug_str     0x0000a17e     0x2244 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
- .debug_str     0x0000a17e      0x205 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
- .debug_str     0x0000a17e     0x1e05 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
- .debug_str     0x0000a17e     0x1b7e ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
- .debug_str     0x0000a17e      0x274 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
- .debug_str     0x0000a17e      0xacf ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
- .debug_str     0x0000a17e      0x1e9 ./ra/board/ra6e2_bgk/board_init.o
+.debug_str      0x00000000     0xad78
+ .debug_str     0x00000000     0xad78 ./src/hal_entry.o
+                               0x1d9f (size before relaxing)
+ .debug_str     0x0000ad78     0x321d ./src/hal_warmstart.o
+ .debug_str     0x0000ad78     0x33bb ./src/i2c_hw_iic0.o
+ .debug_str     0x0000ad78     0x2b27 ./src/i2c_hw_sci9.o
+ .debug_str     0x0000ad78      0x368 ./src/mpu_sensor.o
+ .debug_str     0x0000ad78      0x334 ./src/timer_measurement.o
+ .debug_str     0x0000ad78     0x49ac ./src/uart_logger.o
+ .debug_str     0x0000ad78     0x33e8 ./ra_gen/common_data.o
+ .debug_str     0x0000ad78      0x1d6 ./ra_gen/main.o
+ .debug_str     0x0000ad78     0x1dac ./ra_gen/pin_data.o
+ .debug_str     0x0000ad78     0x4558 ./ra/fsp/src/r_ioport/r_ioport.o
+ .debug_str     0x0000ad78      0x624 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+ .debug_str     0x0000ad78     0x2748 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+ .debug_str     0x0000ad78     0x1cdd ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+ .debug_str     0x0000ad78      0x326 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+ .debug_str     0x0000ad78     0x2244 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+ .debug_str     0x0000ad78      0x205 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
+ .debug_str     0x0000ad78     0x1e05 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+ .debug_str     0x0000ad78     0x1b7e ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+ .debug_str     0x0000ad78      0x274 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+ .debug_str     0x0000ad78      0xacf ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_str     0x0000ad78      0x1e9 ./ra/board/ra6e2_bgk/board_init.o
 
-.debug_frame    0x00000000      0x97c
- .debug_frame   0x00000000       0x68 ./src/hal_entry.o
- .debug_frame   0x00000068       0x20 ./src/hal_warmstart.o
- .debug_frame   0x00000088      0x170 ./src/i2c_bus.o
- .debug_frame   0x000001f8       0x94 ./src/mpu6050.o
- .debug_frame   0x0000028c       0x88 ./src/timer_measurement.o
- .debug_frame   0x00000314      0x170 ./src/uart_logger.o
- .debug_frame   0x00000484       0x20 ./ra_gen/common_data.o
- .debug_frame   0x000004a4       0x28 ./ra_gen/main.o
- .debug_frame   0x000004cc      0x178 ./ra/fsp/src/r_ioport/r_ioport.o
- .debug_frame   0x00000644       0xf4 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
- .debug_frame   0x00000738       0x40 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
- .debug_frame   0x00000778       0x4c ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
- .debug_frame   0x000007c4       0x3c ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
- .debug_frame   0x00000800       0x30 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
- .debug_frame   0x00000830       0x48 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
- .debug_frame   0x00000878       0x38 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
- .debug_frame   0x000008b0       0x64 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
- .debug_frame   0x00000914       0x20 ./ra/board/ra6e2_bgk/board_init.o
- .debug_frame   0x00000934       0x20 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memset.o)
- .debug_frame   0x00000954       0x28 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memcpy-stub.o)
+.debug_frame    0x00000000      0x8fc
+ .debug_frame   0x00000000       0x58 ./src/hal_entry.o
+ .debug_frame   0x00000058       0x20 ./src/hal_warmstart.o
+ .debug_frame   0x00000078       0x88 ./src/i2c_hw_iic0.o
+ .debug_frame   0x00000100       0xa4 ./src/i2c_hw_sci9.o
+ .debug_frame   0x000001a4       0x68 ./src/mpu_sensor.o
+ .debug_frame   0x0000020c       0x88 ./src/timer_measurement.o
+ .debug_frame   0x00000294      0x170 ./src/uart_logger.o
+ .debug_frame   0x00000404       0x20 ./ra_gen/common_data.o
+ .debug_frame   0x00000424       0x28 ./ra_gen/main.o
+ .debug_frame   0x0000044c      0x178 ./ra/fsp/src/r_ioport/r_ioport.o
+ .debug_frame   0x000005c4       0xf4 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+ .debug_frame   0x000006b8       0x40 ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+ .debug_frame   0x000006f8       0x4c ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+ .debug_frame   0x00000744       0x3c ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+ .debug_frame   0x00000780       0x30 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+ .debug_frame   0x000007b0       0x48 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+ .debug_frame   0x000007f8       0x38 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+ .debug_frame   0x00000830       0x64 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_frame   0x00000894       0x20 ./ra/board/ra6e2_bgk/board_init.o
+ .debug_frame   0x000008b4       0x20 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memset.o)
+ .debug_frame   0x000008d4       0x28 C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/../lib/gcc/arm-none-eabi/14.2.1/thumb/v8-m.main+fp/hard\libg_nano.a(libc_a-memcpy-stub.o)
