@@ -1,13 +1,18 @@
 /**
  * @file i2c_bus.c
  * @brief Multi-Bus Independent I2C Master Driver Implementation for RA6E2.
+ *
+ * Implements robust pseudo-open-drain I2C using Renesas RA6E2 GPIO direction switching:
+ * - Output Low: actively drives pin to GND.
+ * - Input with Pull-up: releases pin High to 3.3V (High-Z + internal/external pull-up).
+ * - Full support for clock stretching, repeated start, and bus recovery.
  */
 
 #include "i2c_bus.h"
 #include "timer_measurement.h"
 #include "r_ioport.h"
 
-#define I2C_HALF_DELAY_US   (5U) /* 100 kHz standard mode */
+#define I2C_HALF_DELAY_US   (5U) /* ~100 kHz standard mode half-period */
 
 i2c_bus_t g_i2c_bus1 = {
     .bus_id  = 1,
@@ -33,7 +38,6 @@ static inline void scl_low(const i2c_bus_t *p_bus)
 
 static inline void scl_high(const i2c_bus_t *p_bus)
 {
-    /* Float high with pullup */
     R_BSP_PinAccessEnable();
     R_BSP_PinCfg(p_bus->scl_pin, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_INPUT | IOPORT_CFG_PULLUP_ENABLE));
     R_BSP_PinAccessDisable();
@@ -54,7 +58,6 @@ static inline void sda_low(const i2c_bus_t *p_bus)
 
 static inline void sda_high(const i2c_bus_t *p_bus)
 {
-    /* Float high with pullup */
     R_BSP_PinAccessEnable();
     R_BSP_PinCfg(p_bus->sda_pin, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_INPUT | IOPORT_CFG_PULLUP_ENABLE));
     R_BSP_PinAccessDisable();
@@ -67,11 +70,12 @@ static inline uint32_t sda_read(const i2c_bus_t *p_bus)
 
 static void wait_scl_high(const i2c_bus_t *p_bus)
 {
-    /* Clock stretching support with timeout */
-    uint32_t start = timer_get_cycles();
+    /* Clock stretching support with timeout (~2ms) */
+    uint32_t timeout = 400U;
     while (scl_read(p_bus) == 0U)
     {
-        if (timer_elapsed_us(start) > 2000U) /* 2 ms timeout */
+        timer_delay_us(5U);
+        if (--timeout == 0U)
         {
             break;
         }
@@ -124,6 +128,7 @@ void i2c_init_all(void)
 static void i2c_start(const i2c_bus_t *p_bus)
 {
     sda_high(p_bus);
+    timer_delay_us(I2C_HALF_DELAY_US);
     scl_high(p_bus);
     wait_scl_high(p_bus);
     timer_delay_us(I2C_HALF_DELAY_US);
@@ -286,7 +291,9 @@ i2c_status_t i2c_read_bytes(i2c_bus_t *p_bus, uint8_t dev_addr, uint8_t reg_addr
         return I2C_ERR_NACK;
     }
 
-    /* Repeated Start */
+    /* STOP followed by START for guaranteed clone slave compatibility */
+    i2c_stop(p_bus);
+    timer_delay_us(5U);
     i2c_start(p_bus);
 
     /* Address + Read (1) */

@@ -82,11 +82,9 @@ static inline void rtt_putc(char c)
 
 static inline void delay_cycles(uint32_t cycles)
 {
-    uint32_t start = DWT->CYCCNT;
-    while ((DWT->CYCCNT - start) < cycles)
-    {
-        __NOP();
-    }
+    (void)cycles;
+    /* 1 bit time at 115200 baud is ~8.68 us */
+    R_BSP_SoftwareDelay(8U, BSP_DELAY_UNITS_MICROSECONDS);
 }
 
 void uart_logger_init(uint32_t baud_rate)

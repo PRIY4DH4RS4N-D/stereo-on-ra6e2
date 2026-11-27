@@ -207,11 +207,11 @@ void hal_entry(void)
         R_BSP_PinWrite(BOARD_LED1_PIN, BSP_IO_LEVEL_HIGH);
 
         /* Sensor 1: MPU6050 NECK on Bus 1 */
-        print_sensor_reading(&s_sensor_neck, "BUS 1");
+        print_sensor_reading(&s_sensor_neck, "BUS 1 (SCL=D4, SDA=D5)");
         uart_logger_println("----------------------------------------");
 
         /* Sensor 2: MPU6050 CENTER on Bus 2 */
-        print_sensor_reading(&s_sensor_center, "BUS 2");
+        print_sensor_reading(&s_sensor_center, "BUS 2 (SCL=D2, SDA=D3)");
         uart_logger_println("========================================");
         uart_logger_println("");
 

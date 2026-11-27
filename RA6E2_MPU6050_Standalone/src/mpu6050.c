@@ -6,6 +6,10 @@
 #include "mpu6050.h"
 #include "timer_measurement.h"
 
+/* Additional MPU6050 Register Definitions */
+#define MPU6050_REG_INT_ENABLE   (0x38U)
+#define MPU6050_REG_USER_CTRL    (0x6AU)
+
 mpu6050_status_t mpu6050_read_id(mpu6050_device_t *p_dev, uint8_t *p_who_am_i)
 {
     if (p_dev == NULL || p_dev->p_bus == NULL || p_who_am_i == NULL)
@@ -32,16 +36,34 @@ mpu6050_status_t mpu6050_init(mpu6050_device_t *p_dev)
         return MPU6050_ERR_PARAM;
     }
 
-    /* 1. Wake up MPU6050: Write 0x00 to PWR_MGMT_1 (0x6B) */
-    i2c_status_t err = i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_PWR_MGMT_1, 0x00);
+    /* 1. Device Reset: Write 0x80 to PWR_MGMT_1 (0x6B) */
+    i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_PWR_MGMT_1, 0x80);
+    timer_delay_ms(100U); /* Allow internal reset cycle to complete */
+
+    /* 2. Wake up MPU6050 and set clock source to PLL with X axis gyro reference (0x01).
+     * NOTE: Per InvenSense datasheet, CLKSEL=0 (internal 8MHz) disables gyroscopes.
+     * CLKSEL=1 (PLL X-gyro) is required for stable continuous gyro and accel sampling.
+     */
+    i2c_status_t err = i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_PWR_MGMT_1, 0x01);
     if (err != I2C_SUCCESS)
     {
         p_dev->is_initialized = false;
         return MPU6050_ERR_I2C;
     }
-    timer_delay_ms(10U); /* Allow internal oscillator to stabilize */
+    timer_delay_ms(20U); /* Allow PLL oscillator to lock */
 
-    /* 2. Configure Accelerometer Full Scale Range: ±2g -> Write 0x00 to ACCEL_CONFIG (0x1C) */
+    /* 3. Enable all 6 axes (disable any low-power standby): Write 0x00 to PWR_MGMT_2 (0x6C) */
+    i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_PWR_MGMT_2, 0x00);
+
+    /* 4. Disable FIFO and AUX I2C master mode: Write 0x00 to USER_CTRL (0x6A)
+     * Ensures real-time ADC samples directly update output registers 0x3B-0x48.
+     */
+    i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_USER_CTRL, 0x00);
+
+    /* 5. Disable interrupts: Write 0x00 to INT_ENABLE (0x38) */
+    i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_INT_ENABLE, 0x00);
+
+    /* 6. Configure Accelerometer Full Scale Range: ±2g -> Write 0x00 to ACCEL_CONFIG (0x1C) */
     err = i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_ACCEL_CONFIG, 0x00);
     if (err != I2C_SUCCESS)
     {
@@ -49,7 +71,7 @@ mpu6050_status_t mpu6050_init(mpu6050_device_t *p_dev)
         return MPU6050_ERR_I2C;
     }
 
-    /* 3. Configure Gyroscope Full Scale Range: ±250 dps -> Write 0x00 to GYRO_CONFIG (0x1B) */
+    /* 7. Configure Gyroscope Full Scale Range: ±250 dps -> Write 0x00 to GYRO_CONFIG (0x1B) */
     err = i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_GYRO_CONFIG, 0x00);
     if (err != I2C_SUCCESS)
     {
@@ -57,13 +79,13 @@ mpu6050_status_t mpu6050_init(mpu6050_device_t *p_dev)
         return MPU6050_ERR_I2C;
     }
 
-    /* 4. Set Sample Rate Divider to 0 (1 kHz sample rate) */
+    /* 8. Set Sample Rate Divider: SMPLRT_DIV = 0 (1 kHz / (1 + 0) = 1 kHz sample rate) */
     i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_SMPLRT_DIV, 0x00);
 
-    /* 5. Set DLPF (Digital Low Pass Filter) to ~42-44 Hz bandwidth (Config: 0x03) */
+    /* 9. Set DLPF (Digital Low Pass Filter) to ~42-44 Hz bandwidth: CONFIG (0x1A) = 0x03 */
     i2c_write_reg(p_dev->p_bus, p_dev->dev_addr, MPU6050_REG_CONFIG, 0x03);
 
-    timer_delay_ms(10U);
+    timer_delay_ms(15U);
     p_dev->is_initialized = true;
     return MPU6050_OK;
 }
