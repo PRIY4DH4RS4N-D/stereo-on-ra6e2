@@ -227,7 +227,7 @@ void hal_entry(void)
 
         R_BSP_PinWrite(BOARD_LED1_PIN, BSP_IO_LEVEL_LOW);
 
-        /* 200 ms acquisition period as requested */
-        timer_delay_ms(200U);
+        /* 2 second delay for both readings to print together, then wait 2 seconds */
+        timer_delay_ms(2000U);
     }
 }

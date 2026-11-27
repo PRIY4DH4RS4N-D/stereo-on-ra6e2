@@ -1281,28 +1281,28 @@ LOAD linker stubs
  .comment       0x00000045       0x46 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
  .comment       0x00000045       0x46 ./ra/board/ra6e2_bgk/board_init.o
 
-.debug_info     0x00000000    0x25711
- .debug_info    0x00000000     0x1ca3 ./src/hal_entry.o
- .debug_info    0x00001ca3      0xff8 ./src/hal_warmstart.o
- .debug_info    0x00002c9b     0x5548 ./src/i2c_bus.o
- .debug_info    0x000081e3      0xbaf ./src/mpu6050.o
- .debug_info    0x00008d92      0x4e0 ./src/timer_measurement.o
- .debug_info    0x00009272     0x81e4 ./src/uart_logger.o
- .debug_info    0x00011456     0x125c ./ra_gen/common_data.o
- .debug_info    0x000126b2       0xaa ./ra_gen/main.o
- .debug_info    0x0001275c      0xa31 ./ra_gen/pin_data.o
- .debug_info    0x0001318d     0x4049 ./ra/fsp/src/r_ioport/r_ioport.o
- .debug_info    0x000171d6      0x3f8 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
- .debug_info    0x000175ce     0x5762 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
- .debug_info    0x0001cd30      0x96f ./ra/fsp/src/bsp/mcu/all/bsp_common.o
- .debug_info    0x0001d69f      0x204 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
- .debug_info    0x0001d8a3     0x1363 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
- .debug_info    0x0001ec06       0xb2 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
- .debug_info    0x0001ecb8     0x1d18 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
- .debug_info    0x000209d0     0x3912 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
- .debug_info    0x000242e2      0x187 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
- .debug_info    0x00024469     0x1203 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
- .debug_info    0x0002566c       0xa5 ./ra/board/ra6e2_bgk/board_init.o
+.debug_info     0x00000000    0x25712
+ .debug_info    0x00000000     0x1ca4 ./src/hal_entry.o
+ .debug_info    0x00001ca4      0xff8 ./src/hal_warmstart.o
+ .debug_info    0x00002c9c     0x5548 ./src/i2c_bus.o
+ .debug_info    0x000081e4      0xbaf ./src/mpu6050.o
+ .debug_info    0x00008d93      0x4e0 ./src/timer_measurement.o
+ .debug_info    0x00009273     0x81e4 ./src/uart_logger.o
+ .debug_info    0x00011457     0x125c ./ra_gen/common_data.o
+ .debug_info    0x000126b3       0xaa ./ra_gen/main.o
+ .debug_info    0x0001275d      0xa31 ./ra_gen/pin_data.o
+ .debug_info    0x0001318e     0x4049 ./ra/fsp/src/r_ioport/r_ioport.o
+ .debug_info    0x000171d7      0x3f8 ./ra/fsp/src/bsp/mcu/ra6e2/bsp_linker.o
+ .debug_info    0x000175cf     0x5762 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+ .debug_info    0x0001cd31      0x96f ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+ .debug_info    0x0001d6a0      0x204 ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+ .debug_info    0x0001d8a4     0x1363 ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+ .debug_info    0x0001ec07       0xb2 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
+ .debug_info    0x0001ecb9     0x1d18 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+ .debug_info    0x000209d1     0x3912 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+ .debug_info    0x000242e3      0x187 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+ .debug_info    0x0002446a     0x1203 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_info    0x0002566d       0xa5 ./ra/board/ra6e2_bgk/board_init.o
 
 .debug_abbrev   0x00000000     0x2ef7
  .debug_abbrev  0x00000000      0x3e9 ./src/hal_entry.o

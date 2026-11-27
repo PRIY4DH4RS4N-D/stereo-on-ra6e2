@@ -42,7 +42,7 @@ extern "C" {
 /**
  * @brief Default timeouts in microseconds
  */
-#define ULTRASONIC_DEFAULT_RISING_TIMEOUT_US  (5000U)  /* 5 ms max wait for burst start */
+#define ULTRASONIC_DEFAULT_RISING_TIMEOUT_US  (30000U) /* 30 ms max wait for burst start (handles all sensor variants) */
 #define ULTRASONIC_DEFAULT_FALLING_TIMEOUT_US (35000U) /* 35 ms max wait (~600 cm equivalent) */
 
 /**

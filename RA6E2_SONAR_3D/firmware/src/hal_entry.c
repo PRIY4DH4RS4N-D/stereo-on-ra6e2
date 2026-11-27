@@ -49,98 +49,81 @@ void hal_entry(void)
     R_BSP_PinWrite(BOARD_LED1_PIN, BSP_IO_LEVEL_LOW);
     R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_LOW);
 
-    /* 6. Command polling loop */
+    /* 6. Continuous measurement and command dispatch loop */
     uart_command_t cmd;
     ultrasonic_result_t result;
+    uint32_t auto_req_id = 1U;
+    uint32_t last_measure_time = timer_get_cycles();
+    uint32_t measure_interval_cycles = timer_get_system_clock_hz() / 12U; /* ~83 ms */
 
     while (1)
     {
-        /* Poll for incoming JSON line commands from the Python Dashboard */
+        /* A. Check for incoming commands from host */
         if (uart_protocol_poll_command(&cmd))
         {
-            switch (cmd.type)
+            if (cmd.type == UART_CMD_PING)
             {
-                case UART_CMD_MEASURE:
-                {
-                    /* Activity LED ON */
-                    R_BSP_PinWrite(BOARD_LED1_PIN, BSP_IO_LEVEL_HIGH);
-
-                    /* Execute non-blocking ultrasonic measurement */
-                    ultrasonic_status_t status = ultrasonic_measure(&result);
-
-                    R_BSP_PinWrite(BOARD_LED1_PIN, BSP_IO_LEVEL_LOW);
-
-                    if (status == ULTRASONIC_SUCCESS)
-                    {
-                        /* Echo indicator LED ON */
-                        R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_HIGH);
-
-                        /* Convert cm to integer mm with proper rounding */
-                        int32_t dist_mm = (int32_t)((result.distance_cm * 10.0f) + 0.5f);
-
-                        uart_protocol_send_measurement(
-                            cmd.request_id,
-                            dist_mm,
-                            result.echo_time_us,
-                            "ok"
-                        );
-                    }
-                    else if (status == ULTRASONIC_ERR_RISING_TIMEOUT || status == ULTRASONIC_ERR_FALLING_TIMEOUT)
-                    {
-                        R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_LOW);
-                        uart_protocol_send_measurement(
-                            cmd.request_id,
-                            -1,
-                            0,
-                            "timeout"
-                        );
-                    }
-                    else if (status == ULTRASONIC_ERR_OUT_OF_RANGE_LOW || status == ULTRASONIC_ERR_OUT_OF_RANGE_HIGH)
-                    {
-                        R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_LOW);
-                        uart_protocol_send_measurement(
-                            cmd.request_id,
-                            -1,
-                            result.echo_time_us,
-                            "out_of_range"
-                        );
-                    }
-                    else
-                    {
-                        R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_LOW);
-                        uart_protocol_send_measurement(
-                            cmd.request_id,
-                            -1,
-                            0,
-                            "invalid"
-                        );
-                    }
-                    break;
-                }
-
-                case UART_CMD_PING:
-                {
-                    uart_protocol_send_pong();
-                    break;
-                }
-
-                case UART_CMD_RESET:
-                {
-                    R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_LOW);
-                    uart_protocol_send_raw("{\"type\":\"status\",\"status\":\"reset_ok\"}\r\n");
-                    break;
-                }
-
-                case UART_CMD_INVALID:
-                default:
-                {
-                    uart_protocol_send_error("malformed_command");
-                    break;
-                }
+                uart_protocol_send_pong();
+            }
+            else if (cmd.type == UART_CMD_RESET)
+            {
+                R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_LOW);
+                uart_protocol_send_raw("{\"type\":\"status\",\"status\":\"reset_ok\"}\r\n");
             }
         }
 
-        /* 1 millisecond poll interval */
+        /* B. Continuous live ultrasound measurement streaming */
+        uint32_t now = timer_get_cycles();
+        if ((now - last_measure_time) >= measure_interval_cycles)
+        {
+            last_measure_time = now;
+
+            /* Activity pulse */
+            R_BSP_PinWrite(BOARD_LED1_PIN, BSP_IO_LEVEL_HIGH);
+
+            ultrasonic_status_t status = ultrasonic_measure(&result);
+
+            R_BSP_PinWrite(BOARD_LED1_PIN, BSP_IO_LEVEL_LOW);
+
+            if (status == ULTRASONIC_SUCCESS)
+            {
+                R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_HIGH);
+                int32_t dist_mm = (int32_t)((result.distance_cm * 10.0f) + 0.5f);
+
+                uart_protocol_send_measurement(
+                    auto_req_id++,
+                    dist_mm,
+                    result.echo_time_us,
+                    "ok"
+                );
+            }
+            else if (status == ULTRASONIC_ERR_RISING_TIMEOUT || status == ULTRASONIC_ERR_FALLING_TIMEOUT)
+            {
+                R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_LOW);
+                uart_protocol_send_measurement(
+                    auto_req_id++,
+                    -1,
+                    0,
+                    "timeout"
+                );
+            }
+            else
+            {
+                R_BSP_PinWrite(BOARD_LED2_PIN, BSP_IO_LEVEL_LOW);
+                uart_protocol_send_measurement(
+                    auto_req_id++,
+                    -1,
+                    result.echo_time_us,
+                    "out_of_range"
+                );
+            }
+
+            if (auto_req_id > 999999U)
+            {
+                auto_req_id = 1U;
+            }
+        }
+
         timer_delay_ms(1U);
     }
 }

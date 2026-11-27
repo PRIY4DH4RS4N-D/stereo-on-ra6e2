@@ -14,6 +14,9 @@
 #define PIN_411_HIGH() (R_PORT4->PCNTR3 = (1UL << 11))
 #define PIN_411_LOW()  (R_PORT4->PCNTR3 = (1UL << (11 + 16)))
 
+#define PIN_101_HIGH() (R_PORT1->PCNTR3 = (1UL << 1))
+#define PIN_101_LOW()  (R_PORT1->PCNTR3 = (1UL << (1 + 16)))
+
 static uint32_t s_bit_cycles = 1736U; /* 200 MHz / 115200 */
 static char s_rx_buf[UART_MAX_LINE_LENGTH];
 static size_t s_rx_len = 0;
@@ -83,26 +86,45 @@ void uart_protocol_init(uint32_t baud_rate)
         s_bit_cycles = 1736U;
     }
 
-    /* 1. Configure Hardware SCI0 for bidirectional J-Link CDC UART (COM port) */
-    R_BSP_MODULE_START(FSP_IP_SCI, 0);
-    R_SCI0->SCR = 0;
-    R_SCI0->FCR = 0xF800U; /* Disable FIFO for direct polled access */
-    R_SCI0->SMR = 0;       /* Asynchronous, 8N1, no clock prescaler */
-    R_SCI0->SCMR = 0xF2U;  /* Eight bits, LSB first, normal polarity */
-    R_SCI0->SEMR = R_SCI0_SEMR_BGDM_Msk;
     uint32_t clock = R_FSP_SystemClockHzGet(BSP_FEATURE_SCI_CLOCK);
     uint32_t divisor = 16U * (baud_rate > 0U ? baud_rate : 115200U);
-    R_SCI0->BRR = (uint8_t) ((clock + divisor / 2U) / divisor - 1U);
+
+    /* 1. Configure Hardware SCI9 (Primary J-Link CDC UART on P109 TXD9 / P110 RXD9) */
+    R_BSP_MODULE_START(FSP_IP_SCI, 9);
+    R_SCI9->SCR = 0;
+    R_SCI9->FCR = 0;
+    R_SCI9->SMR = 0;
+    R_SCI9->SCMR = 0xF2U;
+    R_SCI9->SEMR = R_SCI0_SEMR_BGDM_Msk;
+    if (divisor > 0)
+    {
+        R_SCI9->BRR = (uint8_t) ((clock + divisor / 2U) / divisor - 1U);
+    }
     R_BSP_SoftwareDelay(10U, BSP_DELAY_UNITS_MICROSECONDS);
-    /* Enable both Transmitter (TE) and Receiver (RE) */
+    R_SCI9->SCR = (uint8_t)(R_SCI0_SCR_TE_Msk | R_SCI0_SCR_RE_Msk);
+
+    /* 2. Configure Hardware SCI0 (P101 TXD0 / P100 RXD0) */
+    R_BSP_MODULE_START(FSP_IP_SCI, 0);
+    R_SCI0->SCR = 0;
+    R_SCI0->FCR = 0;
+    R_SCI0->SMR = 0;
+    R_SCI0->SCMR = 0xF2U;
+    R_SCI0->SEMR = R_SCI0_SEMR_BGDM_Msk;
+    if (divisor > 0)
+    {
+        R_SCI0->BRR = (uint8_t) ((clock + divisor / 2U) / divisor - 1U);
+    }
+    R_BSP_SoftwareDelay(10U, BSP_DELAY_UNITS_MICROSECONDS);
     R_SCI0->SCR = (uint8_t)(R_SCI0_SCR_TE_Msk | R_SCI0_SCR_RE_Msk);
 
-    /* 2. Configure P411 as GPIO Output High for Arduino D1 UART TX */
+    /* 3. Configure P411 (Arduino D1) and P101 (J-Link CDC TX) as Push-Pull GPIO Output */
     R_BSP_PinAccessEnable();
     R_BSP_PinCfg(BSP_IO_PORT_04_PIN_11, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_HIGH));
+    R_BSP_PinCfg(BSP_IO_PORT_01_PIN_01, (uint32_t)(IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_HIGH));
     R_BSP_PinAccessDisable();
 
     PIN_411_HIGH();
+    PIN_101_HIGH();
 
     s_rx_len = 0;
 }
@@ -112,8 +134,18 @@ static inline void uart_tx_char(char c)
     /* 1. Output to SEGGER RTT Viewer */
     rtt_putc(c);
 
-    /* 2. Output to Hardware SCI0 */
-    for (uint32_t i = 0; i < 50000U; ++i)
+    /* 2. Output to Hardware SCI9 (J-Link CDC UART) */
+    for (uint32_t i = 0; i < 5000U; ++i)
+    {
+        if (R_SCI9->SSR & R_SCI0_SSR_TDRE_Msk)
+        {
+            R_SCI9->TDR = (uint8_t)c;
+            break;
+        }
+    }
+
+    /* 3. Output to Hardware SCI0 */
+    for (uint32_t i = 0; i < 5000U; ++i)
     {
         if (R_SCI0->SSR & R_SCI0_SSR_TDRE_Msk)
         {
@@ -122,9 +154,10 @@ static inline void uart_tx_char(char c)
         }
     }
 
-    /* 3. Output to P411 (Arduino D1 Header) */
+    /* 4. Output to P411 (Arduino D1) and P101 (J-Link CDC TX) via precision bitbang */
     uint32_t start = timer_get_cycles();
     PIN_411_LOW();
+    PIN_101_LOW();
     while ((timer_get_cycles() - start) < s_bit_cycles)
     {
         __NOP();
@@ -137,10 +170,12 @@ static inline void uart_tx_char(char c)
         if (data & 1U)
         {
             PIN_411_HIGH();
+            PIN_101_HIGH();
         }
         else
         {
             PIN_411_LOW();
+            PIN_101_LOW();
         }
         data >>= 1;
 
@@ -152,6 +187,7 @@ static inline void uart_tx_char(char c)
     }
 
     PIN_411_HIGH();
+    PIN_101_HIGH();
     while ((timer_get_cycles() - start) < s_bit_cycles)
     {
         __NOP();
@@ -172,20 +208,32 @@ void uart_protocol_send_raw(const char *str)
 
 static inline bool uart_rx_char(char *p_c)
 {
-    /* Check for and recover from any framing/overrun/parity errors */
-    if (R_SCI0->SSR & (R_SCI0_SSR_ORER_Msk | R_SCI0_SSR_FER_Msk | R_SCI0_SSR_PER_Msk))
+    /* Check SCI9 (J-Link CDC UART on P109/P110) */
+    if (R_SCI9->SSR & (R_SCI0_SSR_ORER_Msk | R_SCI0_SSR_FER_Msk | R_SCI0_SSR_PER_Msk))
     {
-        /* To clear receive errors on RA SCI, toggle RE and reset error bits */
-        R_SCI0->SCR = (uint8_t)(R_SCI0->SCR & ~R_SCI0_SCR_RE_Msk);
-        R_SCI0->SSR = 0xC0U; /* Clear ORER, FER, PER */
-        R_SCI0->SCR = (uint8_t)(R_SCI0->SCR | R_SCI0_SCR_RE_Msk);
+        R_SCI9->SCR = (uint8_t)(R_SCI9->SCR & ~R_SCI0_SCR_RE_Msk);
+        R_SCI9->SSR = 0xC0U;
+        R_SCI9->SCR = (uint8_t)(R_SCI9->SCR | R_SCI0_SCR_RE_Msk);
+    }
+    if (R_SCI9->SSR & R_SCI0_SSR_RDRF_Msk)
+    {
+        *p_c = (char)R_SCI9->RDR;
+        return true;
     }
 
+    /* Check SCI0 (P100/P101) */
+    if (R_SCI0->SSR & (R_SCI0_SSR_ORER_Msk | R_SCI0_SSR_FER_Msk | R_SCI0_SSR_PER_Msk))
+    {
+        R_SCI0->SCR = (uint8_t)(R_SCI0->SCR & ~R_SCI0_SCR_RE_Msk);
+        R_SCI0->SSR = 0xC0U;
+        R_SCI0->SCR = (uint8_t)(R_SCI0->SCR | R_SCI0_SCR_RE_Msk);
+    }
     if (R_SCI0->SSR & R_SCI0_SSR_RDRF_Msk)
     {
         *p_c = (char)R_SCI0->RDR;
         return true;
     }
+
     return false;
 }
 

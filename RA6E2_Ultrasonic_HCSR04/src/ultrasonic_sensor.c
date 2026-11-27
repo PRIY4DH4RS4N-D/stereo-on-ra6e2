@@ -105,9 +105,9 @@ ultrasonic_status_t ultrasonic_measure(ultrasonic_result_t *p_result)
     TRIG_PIN_LOW();
     timer_delay_us(4U);
 
-    /* 2. Generate 10 microsecond trigger pulse */
+    /* 2. Generate 15 microsecond trigger pulse (guaranteed trigger for all HC-SR04 clones) */
     TRIG_PIN_HIGH();
-    timer_delay_us(10U);
+    timer_delay_us(15U);
     TRIG_PIN_LOW();
 
     /* 3. Wait for ECHO rising edge with hard timeout */
